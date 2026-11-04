@@ -18,6 +18,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+/composer.phar
 auth.json
 Homestead.json
 Homestead.yaml

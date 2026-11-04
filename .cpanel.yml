@@ -1,0 +1,15 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home2/krystals/public_html/krystal_landing
+    - cd $DEPLOYPATH && if [ -x /opt/cpanel/composer/bin/composer ]; then php /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --no-interaction; elif [ -x /usr/local/bin/composer ]; then php /usr/local/bin/composer install --no-dev --optimize-autoloader --no-interaction; else [ ! -f composer.phar ] && curl -sS https://getcomposer.org/installer | php; php composer.phar install --no-dev --optimize-autoloader --no-interaction; fi
+    - cd $DEPLOYPATH && [ ! -f .env ] && cp .env.example .env || true
+    - cd $DEPLOYPATH && grep -q "^APP_KEY=base64:" .env || php artisan key:generate --force
+    - cd $DEPLOYPATH && touch database/database.sqlite
+    - cd $DEPLOYPATH && php artisan migrate --force
+    - find $DEPLOYPATH -type d -exec chmod 755 {} \;
+    - find $DEPLOYPATH -type f -exec chmod 644 {} \;
+    - chmod -R 775 $DEPLOYPATH/storage $DEPLOYPATH/bootstrap/cache $DEPLOYPATH/database
+    - cd $DEPLOYPATH && php artisan optimize:clear
+    - cd $DEPLOYPATH && php artisan optimize
+
