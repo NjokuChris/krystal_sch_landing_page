@@ -4,26 +4,32 @@ cd "$DEPLOYPATH" || exit 1
 
 # Prevent chmod changes from showing up as uncommitted Git changes in cPanel
 git config core.fileMode false
+export COMPOSER_MEMORY_LIMIT=-1
+export COMPOSER_MAX_PARALLEL_HTTP=3
 
-# 1. Run Composer install
+# 1. Run Composer install (extract composer.phar to ~/composer_extracted to avoid cPanel phar stream limits)
 if [ -x /opt/cpanel/composer/bin/composer ]; then
-    php /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --no-interaction
+    php -d display_errors=1 /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --no-interaction
 elif [ -x /usr/local/bin/composer ]; then
-    php /usr/local/bin/composer install --no-dev --optimize-autoloader --no-interaction
+    php -d display_errors=1 /usr/local/bin/composer install --no-dev --optimize-autoloader --no-interaction
 else
-    if [ ! -f composer.phar ]; then
-        curl -sS https://getcomposer.org/installer | php
+    if [ ! -f /home2/krystals/composer_extracted/bin/composer ]; then
+        [ ! -f composer.phar ] && curl -sS https://getcomposer.org/installer | php -d display_errors=1
+        php -d display_errors=1 -r '$p = new Phar("composer.phar"); $p->extractTo("/home2/krystals/composer_extracted", null, true);'
+        rm -f composer.phar
     fi
-    php composer.phar install --no-dev --optimize-autoloader --no-interaction
+    php -d display_errors=1 /home2/krystals/composer_extracted/bin/composer install --no-dev --optimize-autoloader --no-interaction
 fi
 
-# 2. Configure .env and APP_KEY if missing
+# 2. Clear any stale cached config first, then configure .env and APP_KEY
+rm -f bootstrap/cache/*.php
+
 if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
 if ! grep -q "^APP_KEY=base64:" .env; then
-    php artisan key:generate --force
+    sed -i "s|^APP_KEY=.*|APP_KEY=base64:$(openssl rand -base64 32)|" .env
 fi
 
 # 3. Create SQLite DB and run migrations
