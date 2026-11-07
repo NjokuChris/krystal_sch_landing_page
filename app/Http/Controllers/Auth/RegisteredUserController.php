@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -44,8 +45,14 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+        ActivityLog::record(
+            event: 'register',
+            description: "{$user->name} created a new account.",
+            userId: $user->id,
+            subjectType: User::class,
+            subjectId: $user->id,
+        );
 
-        return to_route('dashboard');
+        return to_route('login')->with('status', 'Account created successfully! Please log in to continue.');
     }
 }

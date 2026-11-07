@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import AnalyticsSection from '@/components/landing/AnalyticsSection';
 import CTASection from '@/components/landing/CTASection';
+import ChatWidget from '@/components/landing/ChatWidget';
 import DashboardShowcase from '@/components/landing/DashboardShowcase';
 import DemoModal from '@/components/landing/DemoModal';
 import FAQ from '@/components/landing/FAQ';
@@ -128,6 +129,9 @@ export default function Welcome() {
 
                 {/* Demo modal — global */}
                 <DemoModal isOpen={demoOpen} onClose={closeDemo} />
+
+                {/* Chat widget — global */}
+                <ChatWidget />
             </div>
         </>
     );

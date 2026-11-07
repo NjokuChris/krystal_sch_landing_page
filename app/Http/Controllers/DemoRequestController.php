@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DemoRequestRequest;
+use App\Models\ActivityLog;
 use App\Models\DemoRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -40,6 +41,15 @@ class DemoRequestController extends Controller
                 'school_name' => $demoRequest->school_name,
                 'email'       => $demoRequest->email,
             ]);
+
+            ActivityLog::record(
+                event: 'demo_request',
+                description: "{$demoRequest->full_name} from {$demoRequest->school_name} submitted a demo request.",
+                userId: null,
+                subjectType: DemoRequest::class,
+                subjectId: $demoRequest->id,
+                properties: ['school_name' => $demoRequest->school_name, 'email' => $demoRequest->email],
+            );
 
             return response()->json([
                 'success' => true,

@@ -8,7 +8,7 @@ export interface PricingPlan {
     name: string;
     tagline: string;
     description: string;
-    price: null; // [PLACEHOLDER] Real pricing to be confirmed
+    price: null | string; // [PLACEHOLDER] Real pricing to be confirmed
     cta: string;
     ctaVariant: 'oxblood' | 'blue' | 'outline';
     highlighted: boolean;
@@ -18,12 +18,12 @@ export interface PricingPlan {
 
 export const pricingPlans: PricingPlan[] = [
     {
-        id: 'starter',
-        name: 'Starter',
+        id: 'standard',
+        name: 'Standard',
         tagline: 'For smaller schools',
         description:
             'A focused set of tools to help smaller schools take their first step into organised digital management.',
-        price: null,
+        price: '₦500',
         cta: 'Talk to Us',
         ctaVariant: 'outline',
         highlighted: false,
@@ -43,18 +43,18 @@ export const pricingPlans: PricingPlan[] = [
         ],
     },
     {
-        id: 'professional',
-        name: 'Professional',
+        id: 'premium',
+        name: 'Premium',
         tagline: 'For growing schools',
         description:
             'A more complete set of tools for schools that need broader management capabilities as they grow.',
-        price: null,
+        price: '₦1,000',
         cta: 'Request a Demo',
         ctaVariant: 'oxblood',
         highlighted: true,
         badge: 'Most Popular',
         features: [
-            { text: 'Everything in Starter', included: true },
+            { text: 'Everything in Standard', included: true },
             { text: 'Examination & results', included: true },
             { text: 'Timetable management', included: true },
             { text: 'Library management', included: true },
@@ -79,7 +79,7 @@ export const pricingPlans: PricingPlan[] = [
         ctaVariant: 'blue',
         highlighted: false,
         features: [
-            { text: 'Everything in Professional', included: true },
+            { text: 'Everything in Premium', included: true },
             { text: 'Multi-branch support', included: true },
             { text: 'Dedicated account manager', included: true },
             { text: 'Priority support', included: true },

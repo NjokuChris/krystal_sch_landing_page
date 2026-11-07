@@ -213,6 +213,12 @@ export default function Navbar({ onDemoClick }: NavbarProps) {
                             >
                                 Login
                             </a>
+                            <a
+                                href="/register"
+                                className="px-4 py-2 text-sm font-medium text-white bg-[#6B1F2B] hover:bg-[#5a1924] rounded-lg transition-colors border border-[#6B1F2B]"
+                            >
+                                Sign Up
+                            </a>
                             <button
                                 onClick={onDemoClick}
                                 className="btn-oxblood px-5 py-2.5 text-sm font-semibold rounded-xl"
@@ -365,12 +371,20 @@ export default function Navbar({ onDemoClick }: NavbarProps) {
 
                     {/* Mobile CTAs */}
                     <div className="px-6 pt-4 pb-8 space-y-3 border-t border-gray-100 mt-4">
-                        <a
-                            href="/login"
-                            className="block w-full text-center px-5 py-3 text-sm font-medium text-gray-700 rounded-xl border border-gray-200 hover:border-[#6B1F2B] hover:text-[#6B1F2B] transition-colors"
-                        >
-                            Login
-                        </a>
+                        <div className="flex gap-3">
+                            <a
+                                href="/login"
+                                className="flex-1 text-center px-5 py-3 text-sm font-medium text-gray-700 rounded-xl border border-gray-200 hover:border-[#6B1F2B] hover:text-[#6B1F2B] transition-colors"
+                            >
+                                Login
+                            </a>
+                            <a
+                                href="/register"
+                                className="flex-1 text-center px-5 py-3 text-sm font-medium text-white bg-[#6B1F2B] hover:bg-[#5a1924] rounded-xl transition-colors"
+                            >
+                                Sign Up
+                            </a>
+                        </div>
                         <button
                             onClick={onDemoClick}
                             className="btn-oxblood w-full px-5 py-3.5 text-sm font-semibold rounded-xl"

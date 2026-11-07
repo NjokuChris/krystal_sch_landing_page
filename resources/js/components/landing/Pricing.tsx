@@ -78,12 +78,21 @@ export default function Pricing({ onDemoClick }: PricingProps) {
                                     {plan.tagline}
                                 </p>
 
-                                {/* Price placeholder */}
-                                <div className={`text-2xl font-bold mb-2 ${plan.highlighted ? 'text-white' : 'text-gray-900'}`}>
-                                    Contact us
+                                {/* Price */}
+                                <div className={`mb-2 ${plan.highlighted ? 'text-white' : 'text-gray-900'}`}>
+                                    {plan.price ? (
+                                        <>
+                                            <span className="text-3xl font-bold">{plan.price}</span>
+                                            <span className={`text-sm font-medium ml-1 ${plan.highlighted ? 'text-white/70' : 'text-gray-500'}`}>
+                                                / student / term
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <span className="text-2xl font-bold">Contact us</span>
+                                    )}
                                 </div>
                                 <p className={`text-xs ${plan.highlighted ? 'text-white/60' : 'text-gray-400'}`}>
-                                    Pricing tailored to your school size and requirements
+                                    {plan.price ? 'Billed per student each term' : 'Pricing tailored to your school size and requirements'}
                                 </p>
                             </div>
 
