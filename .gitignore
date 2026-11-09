@@ -24,3 +24,5 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+error_log
+public/error_log
