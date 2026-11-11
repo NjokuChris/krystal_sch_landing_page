@@ -25,6 +25,10 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    flash?: {
+        status?: string | null;
+        payment_success?: boolean | null;
+    };
     [key: string]: unknown;
 }
 
@@ -37,5 +41,16 @@ export interface User {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
+    organisation?: {
+        id: number;
+        school_name: string;
+        subdomain?: string | null;
+        payment_method?: string | null;
+        school_type: string;
+        plan: string;
+        billing_cycle: string;
+        status: string;
+        student_count?: number | null;
+    } | null;
     [key: string]: unknown;
 }

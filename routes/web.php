@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemoRequestController;
+use App\Http\Controllers\OrganisationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -12,6 +13,12 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('history', [DashboardController::class, 'history'])->name('history');
+    Route::get('bills', [DashboardController::class, 'bills'])->name('bills');
+
+    // Organisation setup wizard
+    Route::get('organisation/create', [OrganisationController::class, 'create'])->name('organisation.create');
+    Route::post('organisation', [OrganisationController::class, 'store'])->name('organisation.store');
 });
 
 // ── Admin routes ──────────────────────────────────────────────────────────────

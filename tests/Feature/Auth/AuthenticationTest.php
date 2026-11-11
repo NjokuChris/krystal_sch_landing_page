@@ -8,8 +8,27 @@ test('login screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
-test('users can authenticate using the login screen', function () {
+test('users without organisation are redirected to organisation create after login', function () {
     $user = User::factory()->create();
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('organisation.create'));
+});
+
+test('users with organisation are redirected to dashboard after login', function () {
+    $user = User::factory()->create();
+    \App\Models\Organisation::create([
+        'user_id' => $user->id,
+        'school_name' => 'Test School',
+        'school_type' => 'primary',
+        'plan' => 'standard',
+        'billing_cycle' => 'termly',
+    ]);
 
     $response = $this->post('/login', [
         'email' => $user->email,

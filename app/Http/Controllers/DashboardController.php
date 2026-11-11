@@ -5,13 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\DemoRequest;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response|RedirectResponse
     {
+        if (! $request->user()->organisation && ! $request->user()->is_admin) {
+            return redirect()->route('organisation.create');
+        }
+
         $now   = now();
         $today = $now->copy()->startOfDay();
 
@@ -86,5 +92,36 @@ class DashboardController extends Controller
             'recentRegistrations',
             'activityTrend',
         ));
+    }
+
+    public function history(Request $request): Response|RedirectResponse
+    {
+        if (! $request->user()->organisation && ! $request->user()->is_admin) {
+            return redirect()->route('organisation.create');
+        }
+
+        $logs = ActivityLog::where('user_id', $request->user()->id)
+            ->latest()
+            ->paginate(20)
+            ->through(fn (ActivityLog $log) => [
+                'id'          => $log->id,
+                'event'       => $log->event,
+                'description' => $log->description,
+                'ip_address'  => $log->ip_address,
+                'created_at'  => $log->created_at->toISOString(),
+            ]);
+
+        return Inertia::render('history', compact('logs'));
+    }
+
+    public function bills(Request $request): Response|RedirectResponse
+    {
+        if (! $request->user()->organisation && ! $request->user()->is_admin) {
+            return redirect()->route('organisation.create');
+        }
+
+        $organisation = $request->user()->organisation;
+
+        return Inertia::render('bills', compact('organisation'));
     }
 }

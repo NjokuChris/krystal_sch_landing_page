@@ -57,4 +57,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\ActivityLog::class);
     }
+
+    public function organisation(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Organisation::class);
+    }
 }

@@ -1,8 +1,10 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import {
     Activity,
+    CheckCircle2,
     FileText,
     Key,
     LogIn,
@@ -13,6 +15,7 @@ import {
     UserPen,
     UserPlus,
     Users,
+    X,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -101,6 +104,14 @@ function formatEvent(event: string): string {
     return event.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
+function formatPaymentMethod(method?: string | null): string {
+    if (!method) return 'Debit / Credit Card';
+    if (method === 'bank_transfer') return 'Direct Bank Transfer';
+    if (method === 'pay_later') return 'Pay Later / Term Invoice';
+    if (method === 'card') return 'Debit / Credit Card (Paystack/Flutterwave)';
+    return method.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function StatCard({
@@ -139,14 +150,97 @@ function SectionCard({ title, children }: { title: string; children: React.React
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 
 export default function Dashboard({ stats, recentActivity, recentLogins, recentRegistrations, activityTrend }: Props) {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, flash } = usePage<SharedData>().props;
+    const org = auth.user?.organisation;
     const maxTrend = Math.max(...(activityTrend ?? []).map(r => r.count), 1);
+
+    const [showPaymentAlert, setShowPaymentAlert] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('payment_success') === 'true' || flash?.payment_success) {
+            return true;
+        }
+        if (org && !localStorage.getItem(`dismissed_payment_alert_${org.id}`)) {
+            return true;
+        }
+        return false;
+    });
+
+    const dismissPaymentAlert = () => {
+        setShowPaymentAlert(false);
+        if (org && typeof window !== 'undefined') {
+            localStorage.setItem(`dismissed_payment_alert_${org.id}`, 'true');
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
 
             <div className="flex flex-col gap-6 p-4 md:p-6">
+
+                {/* Payment Method Success Alert Banner */}
+                {showPaymentAlert && org && (
+                    <div className="relative overflow-hidden rounded-2xl border-2 border-emerald-500/40 bg-gradient-to-r from-emerald-50 via-teal-50/50 to-white dark:from-emerald-950/60 dark:via-gray-900 dark:to-gray-900 p-5 sm:p-6 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="flex items-start justify-between gap-4">
+                            <div className="flex items-start gap-4">
+                                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shrink-0 text-white shadow-md shadow-emerald-500/20">
+                                    <CheckCircle2 className="w-6 h-6 stroke-[2.5]" />
+                                </div>
+                                <div>
+                                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                                        <h2 className="text-base sm:text-lg font-extrabold text-emerald-950 dark:text-emerald-200">
+                                            Payment Method Successfully Confirmed!
+                                        </h2>
+                                        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-300">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                            Active & Verified
+                                        </span>
+                                    </div>
+
+                                    <p className="text-sm text-emerald-900/80 dark:text-emerald-300/90 max-w-2xl">
+                                        Your subscription payment method (<strong>{formatPaymentMethod(org.payment_method)}</strong>) was processed successfully for <strong>{org.school_name}</strong>.
+                                    </p>
+
+                                    <div className="mt-3 flex flex-wrap items-center gap-3 sm:gap-6 text-xs text-emerald-900 dark:text-emerald-300/80 pt-3 border-t border-emerald-200/60 dark:border-emerald-800/60">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-emerald-700 dark:text-emerald-400">School Portal:</span>
+                                            <a
+                                                href={`https://${org.subdomain || 'school'}.krystal.school`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="font-bold underline decoration-emerald-500 underline-offset-2 hover:text-emerald-600"
+                                            >
+                                                https://{org.subdomain || 'school'}.krystal.school
+                                            </a>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-emerald-700 dark:text-emerald-400">Plan:</span>
+                                            <span className="font-bold uppercase">{org.plan}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-emerald-700 dark:text-emerald-400">Billing Cycle:</span>
+                                            <span className="font-bold uppercase">{org.billing_cycle}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-emerald-700 dark:text-emerald-400">Ref:</span>
+                                            <span className="font-mono font-bold">KRY-ORG-{org.id.toString().padStart(4, '0')}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={dismissPaymentAlert}
+                                title="Dismiss alert"
+                                className="text-emerald-700 hover:text-emerald-950 dark:text-emerald-400 dark:hover:text-emerald-100 p-1.5 rounded-lg hover:bg-emerald-100/50 dark:hover:bg-emerald-900/50 transition-colors cursor-pointer"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Welcome */}
                 <div>

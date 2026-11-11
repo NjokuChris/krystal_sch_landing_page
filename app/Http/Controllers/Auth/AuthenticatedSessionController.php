@@ -40,6 +40,11 @@ class AuthenticatedSessionController extends Controller
             userId: $request->user()->id,
         );
 
+        // If user has no organisation yet, send them to the setup wizard
+        if (! $request->user()->organisation) {
+            return redirect()->route('organisation.create');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
