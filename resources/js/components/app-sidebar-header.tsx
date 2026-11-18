@@ -5,7 +5,7 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { type BreadcrumbItem as BreadcrumbItemType, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Home } from 'lucide-react';
+import { Home, ShieldCheck } from 'lucide-react';
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     const { auth } = usePage<SharedData>().props;
@@ -33,8 +33,18 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                 </div>
             </div>
 
-            {/* Right: Add an Organisation button + Dept: ₦0 + Avatar */}
-            <div className="flex items-center gap-3 sm:gap-5">
+            {/* Right: Admin Panel button + Add an Organisation button + Dept: ₦0 + Avatar */}
+            <div className="flex items-center gap-2.5 sm:gap-4">
+                {auth.user?.is_admin && (
+                    <Link
+                        href="/admin"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#6B1F2B] hover:bg-[#8B2D3C] text-white text-xs font-bold rounded-md shadow-xs transition-colors"
+                    >
+                        <ShieldCheck className="w-3.5 h-3.5 text-rose-300" />
+                        Admin Panel
+                    </Link>
+                )}
+
                 <Link
                     href="/organisation/create"
                     className="inline-flex items-center justify-center px-4 py-2 bg-[#0B1A30] hover:bg-[#142B54] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
