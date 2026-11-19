@@ -51,6 +51,22 @@ class DemoRequestController extends Controller
                 properties: ['school_name' => $demoRequest->school_name, 'email' => $demoRequest->email],
             );
 
+            // Sync automatically to the School Management Platform Onboarding Queue
+            try {
+                $schoolMgtApi = env('SCHOOL_MGT_API_URL', 'https://portal.krystalschool.com.ng/api');
+                \Illuminate\Support\Facades\Http::timeout(5)->post("{$schoolMgtApi}/public/school-requests", [
+                    'school_name' => $demoRequest->school_name,
+                    'contact_name' => $demoRequest->full_name,
+                    'email' => $demoRequest->email,
+                    'phone' => $demoRequest->phone,
+                    'school_type' => $demoRequest->school_type,
+                    'student_count' => $demoRequest->student_count,
+                    'message' => $demoRequest->message,
+                ]);
+            } catch (\Throwable $syncEx) {
+                Log::warning('Could not sync demo request to school_mgt onboarding queue: ' . $syncEx->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Thank you! Your demo request has been received. Our team will be in touch shortly.',
